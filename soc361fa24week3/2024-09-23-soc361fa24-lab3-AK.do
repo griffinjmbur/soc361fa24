@@ -10,13 +10,14 @@ log using ///
 * TASK: demonstrate Lab 3 correct answers
 
 version 17 
-cd ~/desktop/code/soc361fa24
+cd ~/desktop/code/soc361fa24/data
 	* I will note this: to get this to run with minimal changes
 	* just change this to your working directory
 clear all 
 	* MAKE SURE YOU DON'T HAVE CHANGES TO A DATASET THAT YOU HAVEN'T
 	* DOCUMENTED ELSEWHERE IN A DO-FILE OR ELSE THIS WILL DESTROY THOSE.
-use ./data/nhanes1719-extract
+use nhanes1719-extract
+	* Make sure you have this in your working directory of course. 
 
 * 1 Find correlation by hand 
 	gen x = bmxht
@@ -71,11 +72,13 @@ use ./data/nhanes1719-extract
 	di "The SD of y is approximately `sd_y'; exact value is `realsdy'"
 	* checks out
 	
-	local r = `cov'/(`sd_x' * `sd_y')
+	local r = `cov'/(`sd_x' * `sd_y') 
+		// Note that you need to run this with the previous commands
+		// or the locals won't be defined
 	corr x y
 	local realr = r(C)[2,1]
 	di "r_xy by our method is `r'; exact value is `realr'"
-		* note that this is *exactly* correct because the n-1 "fudge factor"
+		* note that this is even closer to correct because the n-1 "fudge factor"
 		* drops out -- the correlation formula does not *have to* involve
 		* sample size (as in "the cosine formula")
 		
@@ -107,10 +110,10 @@ use ./data/nhanes1719-extract
 	di "This is close to our approximation, with slope `b1' and intercept `b0'"
 	
 	* Interp: based on the sample, we estimate that for American children in the
-	* recent past, a centimer increase in height is associated with a 1.05kg
+	* recent past, a CM increase in height is associated with a 1.05kg
 	* increase in weight. Children with no height are estimated to have a weight
-	* of -95kg; this obviously makes NO SENSE IN CONTEXT since the x-value is 
-	* impossible. 
+	* of -95kg; this of course makes NO SENSE IN CONTEXT since the x-value is 
+	* impossible (and so is the predicted value for that matter). 
 	
 	scatter y x || lfit y x
 	
@@ -150,12 +153,11 @@ use ./data/nhanes1719-extract
 	gen htin = x * 0.393701 
 	gen wtlbs = y * 2.20462 
 	
-
 	corr x y 
 	corr htin wtlbs // checks out
 	
 	* Now, our slope for the unstandardized variables should change as follows, 
-	* using the following. I'll round values a bit for simplicity.
+	* using the conversions. I'll round values a bit for simplicity.
 		* COV(2.2X, 0.39Y)/V(0.39X) = (0.39 * 2.2)/(0.38^2) B1 = 2.2/3.9 B1
 		
 	reg wtlbs htin 
@@ -193,7 +195,7 @@ use ./data/nhanes1719-extract
 	* Note that we already had to find this from the regression above. 
 	* However, how else could we find it? We can make a residuals variable
 	* by hand. Let's do that now. What follows below is just repeat, to get
-	* the results in working memory (if you run this whole thing at once, 
+	* the results in working memory (if you run this whole file at once, 
 	* then you won't need to do this).
 	
 	corr x y, cov
@@ -210,8 +212,8 @@ use ./data/nhanes1719-extract
 	
 	gen yhat = `b1'*x + `b0'
 	gen resid = (y - yhat)
-	sum resid // this is approximately correct, but our df is n-2
+	sum resid // the SD is approximately the RMSE, but our df = n-2
 	
 	reg bmxwt bmxht
 	predict ehat, residuals
-	sum ehat
+	sum ehat // the SD is *approximately* the RMSE (again, df are off a bit)
