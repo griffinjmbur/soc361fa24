@@ -132,15 +132,14 @@ use nhanes1719-extract
 * 4 What will the regression slope for standardized variables be? 
 
 	* Based on the steps in the exercises slide, it should just be the 
-	* correlation coefficient.
+	* correlation coefficient. By hand, we find the adjustment.
 	
 	corr x y, cov
 	local cov = r(C)[2, 1]
 	local vx = r(C)[1,1]
 	local vy = r(C)[2,2]
 	local b1 = `cov'/`vx'
-	
-	di `b1' * sqrt(`vx')/sqrt(`vy')
+	di `b1' * `vx'/sqrt(`vy'*`vx')
 	reg z_y z_x
 	
 * 5 Convert to pounds and inches. How will the original slope change? How about
