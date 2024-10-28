@@ -106,6 +106,7 @@
 		gen black = race == 2
 		replace black = . if missing(race)
 		lab def bl 0 "non-black" 1 "black"
+		lab val black bl
 		lab var black "black (or not)"
 		tab black race, mis
 		
@@ -202,6 +203,17 @@
 		* missing or use a flag variable like I show below. 
 		
 		* Bonus: I will show how to do F-tests. 
+		
+		sum * 
+		preserve 
+		drop if missing(educ, sex, race, relig, inc91ths, ///
+			abnomore, absingle, abpoor)
+		sum * 	
+		reg abscale educ black fem 
+		reg abscale educ black fem chrs 
+		reg abscale educ black fem chrs inc91ths 
+		restore 
+		sum * 
 		
 		gen lack_key_obs = ///
 			missing(educ, sex, race, relig, inc91ths, ///
